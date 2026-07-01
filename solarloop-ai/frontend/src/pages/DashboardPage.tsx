@@ -1,242 +1,251 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Factory, Eye, Plus, AlertTriangle, ShieldCheck, TrendingUp, Zap, BarChart3 } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Factory, Eye, Plus, AlertTriangle, ShieldCheck, TrendingUp, Zap, BarChart3, Settings, Play } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { getDashboardSummary, seedDemoData } from '../api/inspections';
 import type { DashboardSummary } from '../api/inspections';
-
 import StatCard from '../components/StatCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
-import { formatDate } from '../utils/format';
-import StatusBadge from '../components/StatusBadge';
+import NationalSolarMap from '../components/NationalSolarMap';
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState<DashboardSummary | null>(null);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSeeding, setIsSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchStats();
+    fetchSummary();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchSummary = async () => {
     try {
       setIsLoading(true);
       const data = await getDashboardSummary();
-      setStats(data);
+      setSummary(data);
     } catch (err: any) {
-      setError(err.message || '통계 정보를 불러오는 과정에서 오류가 발생했습니다.');
+      setError(err.message || '대시보드 데이터를 가져오는데 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCreateDemo = async () => {
+  const handleSeedDemo = async () => {
     try {
       setIsSeeding(true);
+      setError(null);
       const res = await seedDemoData();
-      // Redirect to newly created inspection detail page
-      navigate(`/inspections/${res.inspection_id}`);
+      // Redirect directly to the generated inspection details
+      if (res.inspection_id) {
+        navigate(`/inspections/${res.inspection_id}`);
+      } else {
+        await fetchSummary();
+      }
     } catch (err: any) {
-      alert(`데모 생성 실패: ${err.response?.data?.detail || err.message}`);
+      setError(err.response?.data?.detail || err.message || '데모 시딩 중 오류가 발생했습니다.');
     } finally {
       setIsSeeding(false);
     }
   };
 
   if (isLoading) {
-    return <LoadingSpinner message="SolarLoop AI 대시보드 분석 정보를 생성 중입니다..." />;
-  }
-
-  if (error || !stats) {
-    return (
-      <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm max-w-2xl mx-auto my-12">
-        <h4 className="font-bold mb-2">오류 발생</h4>
-        <p>{error}</p>
-        <button
-          onClick={fetchStats}
-          className="mt-4 px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-semibold rounded-lg text-xs transition-colors"
-        >
-          재시도
-        </button>
-      </div>
-    );
+    return <LoadingSpinner message="솔라루프 대시보드를 구축하고 있습니다..." />;
   }
 
   // Pre-process chart data
-  const hasData = stats.total_plants > 0;
-  
-  // Fake chart data showing power recovery opportunities
-  const mockChartData = [
-    { name: '오염 세척', value: 12.4, color: '#f59e0b' },
-    { name: '음영 확인', value: 8.5, color: '#f97316' },
-    { name: '결선 수리', value: 15.8, color: '#ec4899' },
-    { name: '소자 교체', value: 24.2, color: '#a855f7' },
-    { name: '기타 보수', value: 5.1, color: '#6366f1' }
-  ];
+  const chartData = summary?.capacity_by_type.map(item => ({
+    name: item.plant_type === 'ROOFTOP' ? '지붕형' : item.plant_type === 'GROUND' ? '지상형' : '수상형',
+    '용량 (kW)': item.total_capacity
+  })) || [];
 
   return (
     <div className="space-y-8">
-      {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-900 to-slate-900 border border-brand-500/10 p-8 shadow-xl">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
-            <h2 className="text-2xl font-black text-slate-100 mb-2 tracking-tight">태양광 유지관리 AI 관제 센터</h2>
-            <p className="text-slate-400 text-sm max-w-xl leading-relaxed">
-              자율비행 드론이 촬영한 열화상·RGB 이미지 및 발전소 텔레메트리 데이터를 결합해 패널 오염과 파손, 핫스팟 등 실시간 발전 손실 리스크를 자동 분석합니다.
-            </p>
-          </div>
-          
-          <div className="flex gap-3">
-            <button
-              onClick={handleCreateDemo}
-              disabled={isSeeding}
-              className="px-5 py-3 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-slate-100 font-bold text-sm tracking-wide shadow-lg shadow-brand-500/10 hover:shadow-brand-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2 shrink-0"
-            >
-              <TrendingUp className="w-4 h-4" />
-              {isSeeding ? '데모 시딩 및 분석 중...' : '원클릭 데모 데이터 생성'}
-            </button>
-            
-            <button
-              onClick={() => navigate('/plants/new')}
-              className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/40 text-slate-200 font-bold text-sm tracking-wide transition-colors flex items-center gap-1.5 shrink-0"
-            >
-              <Plus className="w-4 h-4" />
-              발전소 등록
-            </button>
-          </div>
+      {/* Banner / Title Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-slate-200/80 p-6 rounded-3xl shadow-xs">
+        <div>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">태양광 유지관리 관제 센터</h2>
+          <p className="text-xs text-slate-500 mt-1 leading-normal">
+            드론 촬영 이미지 분석 결과와 발전 통계를 종합하여 패널 노후화 상태를 실시간 진단합니다.
+          </p>
+        </div>
+
+        <div>
+          <button
+            onClick={handleSeedDemo}
+            disabled={isSeeding}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-bold text-xs tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer"
+          >
+            <Play className="w-3.5 h-3.5 fill-current" />
+            {isSeeding ? '데모 데이터 시뮬레이션 중...' : '원클릭 데모 데이터 생성'}
+          </button>
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {error && (
+        <div className="p-4 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 text-xs font-semibold">
+          {error}
+        </div>
+      )}
+
+      {/* 1. National Map and Assets Overview (User Requirement) */}
+      {summary && summary.recent_plants.length > 0 ? (
+        <NationalSolarMap plants={summary.recent_plants} />
+      ) : (
+        <div className="border border-slate-200/85 bg-white rounded-3xl p-8 text-center text-slate-500 shadow-xs">
+          <p className="text-xs font-semibold">등록된 태양광 발전소가 없습니다.</p>
+          <p className="text-[11px] text-slate-400 mt-1">
+            원클릭 데모 데이터 생성 버튼을 클릭하거나 상단의 '신규 발전소 등록'을 통해 발전소 자산을 생성하십시오.
+          </p>
+        </div>
+      )}
+
+      {/* 2. Key Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="모니터링 중인 발전소"
-          value={stats.total_plants}
-          icon={<Factory className="w-5 h-5" />}
-          description="현재 등록된 총 태양광 발전소"
+          title="총 관리 발전소"
+          value={summary?.total_plants || 0}
+          unit="개소"
+          icon={Factory}
+          description="자산 관제 하에 운영 중"
+          trend="정상 작동 중"
         />
         <StatCard
-          title="누적 드론 정기 점검"
-          value={stats.total_inspections}
-          icon={<Eye className="w-5 h-5" />}
-          description="촬영 이미지 및 센서 데이터 수집 횟수"
+          title="누적 점검 건수"
+          value={summary?.total_inspections || 0}
+          unit="건"
+          icon={Eye}
+          description="드론 영상 기반 전수 진단"
+          trend="실시간 업데이트"
         />
         <StatCard
-          title="인공지능 진단 완료"
-          value={stats.analyzed_inspections}
-          icon={<ShieldCheck className="w-5 h-5 text-emerald-400" />}
-          description="진단 알고리즘 분석 완료 점검 건수"
-          trend={stats.total_inspections > 0 ? `${Math.round((stats.analyzed_inspections / stats.total_inspections) * 100)}%` : undefined}
+          title="발전 손실 감지"
+          value={summary?.total_anomaly_zones || 0}
+          unit="구역"
+          icon={AlertTriangle}
+          description="세척/수리 권장 셀 리스트"
+          trend="조치 요구됨"
+          isWarning={true}
         />
         <StatCard
-          title="고위험 주의 구역"
-          value={stats.high_risk_zones_count}
-          icon={<AlertTriangle className="w-5 h-5 text-rose-500" />}
-          description="유지보수 점수가 70점 이상인 구역 수"
-          trend={stats.high_risk_zones_count > 0 ? '긴급 점검' : '안정'}
-          trendIsPositive={stats.high_risk_zones_count === 0}
+          title="안전 가동율"
+          value={summary && summary.total_zones_count > 0 
+            ? Math.round(((summary.total_zones_count - summary.total_anomaly_zones) / summary.total_zones_count) * 100)
+            : 100
+          }
+          unit="%"
+          icon={ShieldCheck}
+          description="전체 패널 진단 대비 정상율"
+          trend="양호"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left: Recent scans */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-amber-500" />
-              최근 드론 자율점검 현황
-            </h3>
-            <button
-              onClick={() => navigate('/plants')}
-              className="text-xs font-semibold text-brand-400 hover:text-brand-300 transition-colors"
-            >
-              전체 보기
-            </button>
-          </div>
+      {/* 3. Under Table and Bar Charts split */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column: Recent Inspections */}
+        <div className="lg:col-span-8 border border-slate-200/80 bg-white rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                <BarChart3 className="w-4 h-4 text-brand-500" />
+                최근 드론 영상 진단 현황
+              </h3>
+              <Link to="/plants" className="text-[11px] font-bold text-brand-600 hover:text-brand-500">
+                더보기
+              </Link>
+            </div>
 
-          {!hasData ? (
-            <EmptyState
-              title="등록된 데이터가 없습니다"
-              description="상단의 데모 데이터 생성 버튼을 클릭하거나, 신규 발전소 및 점검 데이터를 직접 등록해 분석을 실행해 보세요."
-              actionButton={
-                <button
-                  onClick={handleCreateDemo}
-                  className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-slate-100 font-bold text-xs transition-colors"
-                >
-                  데모 시드 데이터 생성
-                </button>
-              }
-            />
-          ) : (
-            <div className="border border-slate-800/80 bg-slate-900/40 rounded-2xl overflow-hidden backdrop-blur-md">
+            {summary && summary.recent_inspections.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-slate-400">
-                  <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-300 text-xs font-bold uppercase tracking-wider">
+                <table className="w-full text-left text-xs text-slate-500">
+                  <thead className="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-100">
                     <tr>
-                      <th className="px-6 py-4">발전소명</th>
-                      <th className="px-6 py-4">점검 제목</th>
-                      <th className="px-6 py-4">상태</th>
-                      <th className="px-6 py-4">업로드 일시</th>
-                      <th className="px-6 py-4 text-right">관리</th>
+                      <th className="px-4 py-3">점검 타질</th>
+                      <th className="px-4 py-3">발전소명</th>
+                      <th className="px-4 py-3">진단 구역</th>
+                      <th className="px-4 py-3">분석 상태</th>
+                      <th className="px-4 py-3 text-right">상세</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60">
-                    {stats.recent_inspections.map((ins) => (
-                      <tr key={ins.id} className="hover:bg-slate-800/20 transition-colors">
-                        <td className="px-6 py-4 font-bold text-slate-300">{ins.plant_name}</td>
-                        <td className="px-6 py-4">{ins.title}</td>
-                        <td className="px-6 py-4">
-                          <StatusBadge status={ins.status} />
-                        </td>
-                        <td className="px-6 py-4 text-xs text-slate-500">{formatDate(ins.created_at)}</td>
-                        <td className="px-6 py-4 text-right">
-                          <button
-                            onClick={() => navigate(`/inspections/${ins.id}`)}
-                            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-colors"
-                          >
-                            상세 분석
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {summary.recent_inspections.slice(0, 5).map((ins) => {
+                      const pl = summary.recent_plants.find(p => p.id === ins.plant_id);
+                      return (
+                        <tr key={ins.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-4 py-3 font-bold text-slate-800">{ins.title}</td>
+                          <td className="px-4 py-3 text-slate-500">{pl?.name || '-'}</td>
+                          <td className="px-4 py-3">{ins.rows} × {ins.cols} ({ins.rows * ins.cols}구역)</td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${
+                              ins.status === 'analyzed' 
+                                ? 'bg-emerald-50 text-emerald-600'
+                                : ins.status === 'failed'
+                                  ? 'bg-rose-50 text-rose-600'
+                                  : 'bg-amber-50 text-amber-600'
+                            }`}>
+                              {ins.status === 'analyzed' ? '분석 완료' : ins.status === 'failed' ? '실패' : '대기 중'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              onClick={() => navigate(`/inspections/${ins.id}`)}
+                              className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-[10px] font-bold text-slate-600 transition-colors cursor-pointer"
+                            >
+                              관제
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="py-12 text-center text-slate-400 text-xs font-semibold">
+                진단 이력이 없습니다.
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Right: Diagnosis stats visual */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-brand-400" />
-            조치별 발전량 복구 잠재력
+        {/* Right Column: Plant Type capacity Chart */}
+        <div className="lg:col-span-4 border border-slate-200/80 bg-white rounded-3xl p-6 shadow-xs flex flex-col">
+          <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5 mb-6">
+            <TrendingUp className="w-4 h-4 text-brand-500" />
+            설비 유형별 용량 비율
           </h3>
-          <div className="border border-slate-800/80 bg-slate-900/40 rounded-2xl p-6 backdrop-blur-md flex flex-col justify-between h-[300px]">
-            <span className="text-xs text-slate-500 block mb-2">유지보수 작업 유형별 일일 전력 생산 회복 기대치 (kWh)</span>
-            <div className="w-full flex-1 min-h-[200px]">
+
+          <div className="flex-1 min-h-[220px]">
+            {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={mockChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                  <XAxis dataKey="name" stroke="#64748b" fontSize={9} tickLine={false} />
-                  <YAxis stroke="#64748b" fontSize={9} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px' }}
-                    labelStyle={{ color: '#94a3b8', fontWeight: 'bold', fontSize: '11px' }}
-                    itemStyle={{ color: '#38abf8', fontSize: '11px' }}
+                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#ffffff', 
+                      borderRadius: '12px', 
+                      border: '1px solid #e2e8f0',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)'
+                    }} 
+                    labelStyle={{ fontWeight: 'bold', color: '#1e293b' }}
                   />
-                  <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                    {mockChartData.map((entry, idx) => (
-                      <Cell key={`cell-${idx}`} fill={entry.color} />
+                  <Bar dataKey="용량 (kW)" radius={[6, 6, 0, 0]}>
+                    {chartData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={index % 3 === 0 ? '#0284c7' : index % 3 === 1 ? '#0d9488' : '#f59e0b'} 
+                      />
                     ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs font-semibold">
+                차트 시각화 데이터가 부족합니다.
+              </div>
+            )}
           </div>
         </div>
       </div>

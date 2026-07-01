@@ -81,12 +81,12 @@ const InspectionDetailPage: React.FC = () => {
 
   if (error || !detail) {
     return (
-      <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm max-w-2xl mx-auto my-12">
-        <h4 className="font-bold mb-2">오류 발생</h4>
+      <div className="p-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 text-sm max-w-2xl mx-auto my-12 font-semibold">
+        <h4 className="font-black mb-2 text-rose-800">오류 발생</h4>
         <p>{error}</p>
         <button
           onClick={fetchDetail}
-          className="mt-4 px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-semibold rounded-lg text-xs transition-colors"
+          className="mt-4 px-4 py-2 bg-rose-100 hover:bg-rose-250 text-rose-700 font-bold rounded-xl text-xs transition-colors cursor-pointer"
         >
           재시도
         </button>
@@ -103,20 +103,20 @@ const InspectionDetailPage: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-slate-900">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
-              <Factory className="w-3.5 h-3.5 text-slate-600" />
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+              <Factory className="w-3.5 h-3.5 text-slate-400" />
               {plant.name} ({getPlantTypeLabel(plant.plant_type)})
             </span>
-            <span className="text-slate-700">•</span>
-            <span className="text-xs text-slate-500 flex items-center gap-1">
+            <span className="text-slate-300">•</span>
+            <span className="text-xs text-slate-400 font-bold flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" />
               {formatDate(inspection.created_at)}
             </span>
           </div>
-          <h2 className="text-2xl font-black text-slate-100 tracking-tight">{inspection.title}</h2>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">{inspection.title}</h2>
         </div>
 
         <div className="flex items-center gap-3">
@@ -126,7 +126,7 @@ const InspectionDetailPage: React.FC = () => {
             <button
               onClick={handleRunAnalysis}
               disabled={isAnalyzing}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-slate-100 font-bold text-sm tracking-wide shadow-md transition-all active:scale-95 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm tracking-wide shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Play className="w-4 h-4 fill-current" />
               {isAnalyzing ? '규칙 엔진 진단 분석 중...' : '진단 분석 실행'}
@@ -137,12 +137,12 @@ const InspectionDetailPage: React.FC = () => {
 
       {/* Warning if not analyzed */}
       {!isAnalyzed && (
-        <div className="p-5 border border-amber-500/20 bg-amber-500/5 rounded-2xl flex items-start gap-3 max-w-4xl">
-          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+        <div className="p-5 border border-amber-200 bg-amber-50/50 rounded-2xl flex items-start gap-3 max-w-4xl">
+          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5 animate-bounce" />
           <div>
-            <h4 className="text-sm font-bold text-slate-200">아직 진단이 실행되지 않은 점검 데이터입니다.</h4>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              오른쪽 상단의 <strong className="text-amber-400 font-semibold">“진단 분석 실행”</strong> 버튼을 클릭하여 규칙 기반 결함 판별 프로세스를 작동시키십시오. 드론 촬영 픽셀 반사값 스캐닝 및 발전 로그 동기화 처리가 진행됩니다.
+            <h4 className="text-sm font-black text-slate-800">아직 진단이 실행되지 않은 점검 데이터입니다.</h4>
+            <p className="text-xs text-slate-500 font-semibold mt-1 leading-relaxed">
+              오른쪽 상단의 <strong className="text-amber-600 font-bold">“진단 분석 실행”</strong> 버튼을 클릭하여 규칙 기반 결함 판별 프로세스를 작동시키십시오. 드론 촬영 픽셀 반사값 스캐닝 및 발전 로그 동기화 처리가 진행됩니다.
             </p>
           </div>
         </div>
@@ -153,10 +153,10 @@ const InspectionDetailPage: React.FC = () => {
         {/* Left column: Drone image visualization overlay & CSS Grid */}
         <div className="lg:col-span-2 space-y-6">
           {/* Visual screen card */}
-          <div className="border border-slate-800/80 bg-slate-900/40 rounded-2xl overflow-hidden backdrop-blur-md">
-            <div className="bg-slate-950/60 border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-brand-400" />
+          <div className="border border-slate-200 bg-white rounded-3xl overflow-hidden shadow-xs">
+            <div className="bg-slate-50 border-b border-slate-200/80 px-6 py-3.5 flex items-center justify-between">
+              <span className="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                <Activity className="w-4 h-4 text-brand-600" />
                 드론 수집 영상 매핑 뷰어
               </span>
               
@@ -164,10 +164,10 @@ const InspectionDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setImageTab('rgb')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors ${
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                     imageTab === 'rgb' 
-                      ? 'bg-brand-600 text-slate-100' 
-                      : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                      ? 'bg-brand-600 text-white' 
+                      : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   RGB 가시광선
@@ -176,12 +176,12 @@ const InspectionDetailPage: React.FC = () => {
                   type="button"
                   onClick={() => setImageTab('thermal')}
                   disabled={!thermal_image_url}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors ${
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                     !thermal_image_url ? 'opacity-40 cursor-not-allowed' : ''
                   } ${
                     imageTab === 'thermal' 
-                      ? 'bg-amber-600 text-slate-100' 
-                      : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                      ? 'bg-amber-600 text-white' 
+                      : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   열화상 (Thermal)
@@ -190,7 +190,7 @@ const InspectionDetailPage: React.FC = () => {
             </div>
 
             {/* Translucent overlay container on image */}
-            <div className="relative aspect-[16/10] bg-slate-950/90 w-full overflow-hidden flex items-center justify-center">
+            <div className="relative aspect-[16/10] bg-slate-100 w-full overflow-hidden flex items-center justify-center">
               {imageTab === 'rgb' ? (
                 <img
                   src={image_url}
@@ -217,20 +217,19 @@ const InspectionDetailPage: React.FC = () => {
                 }}>
                   {zones.map((zone) => {
                     const isSelected = selectedZone?.id === zone.id;
-                    const style = getStatusStyle(zone.recommendation_label);
                     
                     return (
                       <div
                         key={zone.id}
                         onClick={() => setSelectedZone(zone)}
-                        className={`w-full h-full border border-slate-100/10 hover:border-slate-100/40 hover:bg-slate-500/10 transition-all duration-150 cursor-pointer flex items-center justify-center relative ${
-                          isSelected ? 'bg-brand-500/15 border-brand-400/80 ring-2 ring-brand-400 z-10' : ''
+                        className={`w-full h-full border border-white/20 hover:bg-slate-500/10 transition-all duration-150 cursor-pointer flex items-center justify-center relative ${
+                          isSelected ? 'bg-brand-500/15 border-brand-500 ring-2 ring-brand-600 z-10' : ''
                         }`}
                       >
                         <span className={`px-1 py-0.5 rounded text-[8px] font-black ${
                           isSelected 
-                            ? 'bg-brand-500 text-slate-950' 
-                            : 'bg-slate-950/70 text-slate-300'
+                            ? 'bg-brand-650 text-white shadow-xs' 
+                            : 'bg-slate-900/80 text-white'
                         }`}>
                           {zone.zone_code}
                         </span>
@@ -257,7 +256,7 @@ const InspectionDetailPage: React.FC = () => {
         {/* Right column: Action list & detailed focus */}
         <div className="space-y-6 flex flex-col">
           {/* Priority List */}
-          <div className="border border-slate-800/80 bg-slate-900/40 rounded-2xl p-6 backdrop-blur-md flex-1">
+          <div className="border border-slate-200 bg-white rounded-3xl p-6 shadow-xs flex-1">
             <PriorityActionList
               actions={actions}
               onActionClick={handleActionClick}
@@ -272,10 +271,10 @@ const InspectionDetailPage: React.FC = () => {
                 onClose={() => setSelectedZone(null)}
               />
             ) : (
-              <div className="w-full h-full border border-slate-800/80 bg-slate-900/20 rounded-2xl p-6 flex flex-col items-center justify-center text-center text-slate-500">
-                <Info className="w-8 h-8 mb-2 opacity-40" />
-                <span className="text-xs font-semibold">선택된 구역 없음</span>
-                <span className="text-[10px] mt-1">그리드나 우선순위 리스트에서 구역을 선택하면<br />상세 결함 프로필 차트를 확인할 수 있습니다.</span>
+              <div className="w-full h-full border border-slate-200 bg-slate-50 rounded-3xl p-6 flex flex-col items-center justify-center text-center text-slate-400">
+                <Info className="w-8 h-8 mb-2 opacity-40 text-slate-400" />
+                <span className="text-xs font-black">선택된 구역 없음</span>
+                <span className="text-[10px] font-semibold mt-1 text-slate-400">그리드나 우선순위 리스트에서 구역을 선택하면<br />상세 결함 프로필 차트를 확인할 수 있습니다.</span>
               </div>
             )}
           </div>
@@ -285,34 +284,34 @@ const InspectionDetailPage: React.FC = () => {
       {/* Summary statistics block */}
       {isAnalyzed && summary && (
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-300 flex items-center gap-1.5">
-            <BarChart className="w-4 h-4 text-brand-400" />
+          <h3 className="text-sm font-black text-slate-800 flex items-center gap-1.5">
+            <BarChart className="w-4 h-4 text-brand-600" />
             진단 집계 통계
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-            <div className="border border-slate-850 bg-slate-900/30 rounded-xl p-4 text-center">
-              <span className="text-[10px] font-bold text-slate-500 block mb-1">총 구역 수</span>
-              <strong className="text-xl font-black text-slate-200">{summary.total_zones}</strong>
+            <div className="border border-slate-200 bg-white rounded-2xl p-4 text-center shadow-2xs">
+              <span className="text-[10px] font-black text-slate-400 block mb-1">총 구역 수</span>
+              <strong className="text-xl font-black text-slate-800">{summary.total_zones}</strong>
             </div>
-            <div className="border border-slate-850 bg-slate-900/30 rounded-xl p-4 text-center">
-              <span className="text-[10px] font-bold text-emerald-500/80 block mb-1">정상 모니터링</span>
-              <strong className="text-xl font-black text-emerald-400">{summary.normal_count}</strong>
+            <div className="border border-slate-200 bg-white rounded-2xl p-4 text-center shadow-2xs">
+              <span className="text-[10px] font-black text-emerald-500/80 block mb-1">정상 모니터링</span>
+              <strong className="text-xl font-black text-emerald-600">{summary.normal_count}</strong>
             </div>
-            <div className="border border-slate-850 bg-slate-900/30 rounded-xl p-4 text-center">
-              <span className="text-[10px] font-bold text-amber-500/80 block mb-1">세척 우선</span>
-              <strong className="text-xl font-black text-amber-400">{summary.cleaning_priority_count}</strong>
+            <div className="border border-slate-200 bg-white rounded-2xl p-4 text-center shadow-2xs">
+              <span className="text-[10px] font-black text-amber-500/80 block mb-1">세척 우선</span>
+              <strong className="text-xl font-black text-amber-600">{summary.cleaning_priority_count}</strong>
             </div>
-            <div className="border border-slate-850 bg-slate-900/30 rounded-xl p-4 text-center">
-              <span className="text-[10px] font-bold text-rose-500/80 block mb-1">정밀점검 필요</span>
-              <strong className="text-xl font-black text-rose-400">{summary.inspection_required_count}</strong>
+            <div className="border border-slate-200 bg-white rounded-2xl p-4 text-center shadow-2xs">
+              <span className="text-[10px] font-black text-rose-500/80 block mb-1">정밀점검 필요</span>
+              <strong className="text-xl font-black text-rose-600">{summary.inspection_required_count}</strong>
             </div>
-            <div className="border border-slate-850 bg-slate-900/30 rounded-xl p-4 text-center">
-              <span className="text-[10px] font-bold text-sky-500/80 block mb-1">강우 후 재확인</span>
-              <strong className="text-xl font-black text-sky-400">{summary.wait_for_rain_count}</strong>
+            <div className="border border-slate-200 bg-white rounded-2xl p-4 text-center shadow-2xs">
+              <span className="text-[10px] font-black text-sky-500/80 block mb-1">강우 후 재확인</span>
+              <strong className="text-xl font-black text-sky-600">{summary.wait_for_rain_count}</strong>
             </div>
-            <div className="border border-slate-850 bg-slate-900/30 rounded-xl p-4 text-center">
-              <span className="text-[10px] font-bold text-purple-500/80 block mb-1">수리 검토</span>
-              <strong className="text-xl font-black text-purple-400">{summary.repair_review_count}</strong>
+            <div className="border border-slate-200 bg-white rounded-2xl p-4 text-center shadow-2xs">
+              <span className="text-[10px] font-black text-purple-500/80 block mb-1">수리 검토</span>
+              <strong className="text-xl font-black text-purple-600">{summary.repair_review_count}</strong>
             </div>
           </div>
         </div>
@@ -321,11 +320,11 @@ const InspectionDetailPage: React.FC = () => {
       {/* Tabular details list */}
       {isAnalyzed && zones.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-300">구역별 분석 세부 명세</h3>
-          <div className="border border-slate-800/80 bg-slate-900/40 rounded-2xl overflow-hidden backdrop-blur-md">
+          <h3 className="text-sm font-black text-slate-800">구역별 분석 세부 명세</h3>
+          <div className="border border-slate-200 bg-white rounded-3xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-400">
-                <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-300 text-xs font-bold uppercase tracking-wider">
+              <table className="w-full text-left text-sm text-slate-500 font-semibold">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs font-black uppercase tracking-wider">
                   <tr>
                     <th className="px-6 py-4">구역 코드</th>
                     <th className="px-6 py-4">진단 결함 상태</th>
@@ -335,32 +334,30 @@ const InspectionDetailPage: React.FC = () => {
                     <th className="px-6 py-4 text-right">상세조회</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100">
                   {zones.map((zone) => {
-                    const style = getStatusStyle(zone.recommendation_label);
-                    
                     return (
                       <tr
                         key={zone.id}
-                        className={`hover:bg-slate-800/20 transition-colors ${
-                          selectedZone?.id === zone.id ? 'bg-brand-500/5' : ''
+                        className={`hover:bg-slate-50/50 transition-colors ${
+                          selectedZone?.id === zone.id ? 'bg-brand-50/30' : ''
                         }`}
                       >
-                        <td className="px-6 py-4 font-black text-slate-200">{zone.zone_code}</td>
+                        <td className="px-6 py-4 font-black text-slate-800">{zone.zone_code}</td>
                         <td className="px-6 py-4">
                           <StatusBadge status={zone.status_label} />
                         </td>
                         <td className="px-6 py-4">
                           <RecommendationBadge label={zone.recommendation_label} />
                         </td>
-                        <td className="px-6 py-4 font-bold text-slate-300">{formatScore(zone.priority_score)}</td>
-                        <td className="px-6 py-4 text-xs max-w-xs truncate" title={zone.explanation}>
+                        <td className="px-6 py-4 font-black text-slate-750">{formatScore(zone.priority_score)}</td>
+                        <td className="px-6 py-4 text-xs font-medium max-w-xs truncate" title={zone.explanation}>
                           {zone.explanation || '-'}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => setSelectedZone(zone)}
-                            className="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition-colors"
+                            className="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600 transition-colors cursor-pointer"
                           >
                             조회
                           </button>

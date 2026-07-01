@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.core.database import get_db
 from app.models.plant import Plant as PlantModel
 from app.models.inspection import Inspection as InspectionModel
@@ -21,6 +22,38 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
         PanelZoneModel.priority_score >= 70.0
     ).count()
     
+    # Retrieve all plants for mapping
+    all_plants_db = db.query(PlantModel).order_by(PlantModel.created_at.desc()).all()
+    recent_plants = []
+    for p in all_plants_db:
+        recent_plants.append({
+            "id": p.id,
+            "name": p.name,
+            "location": p.location_name or "",
+            "location_name": p.location_name or "",
+            "capacity_kw": p.capacity_kw,
+            "plant_type": p.plant_type,
+            "owner_name": p.owner_name or "",
+            "created_at": p.created_at.isoformat() if p.created_at else ""
+        })
+        
+    # Capacity by type
+    capacity_by_type_query = db.query(
+        PlantModel.plant_type,
+        func.sum(PlantModel.capacity_kw).label("total_capacity")
+    ).group_by(PlantModel.plant_type).all()
+    
+    capacity_by_type = [
+        {"plant_type": row[0], "total_capacity": float(row[1] or 0)}
+        for row in capacity_by_type_query
+    ]
+    
+    # Total zones counts and anomaly counts
+    total_zones_count = db.query(PanelZoneModel).count()
+    total_anomaly_zones = db.query(PanelZoneModel).filter(
+        PanelZoneModel.recommendation_label != 'NORMAL_MONITORING'
+    ).count()
+    
     # Retrieve the 5 most recent inspections, joined with their plants
     recent_db_inspections = db.query(InspectionModel).order_by(
         InspectionModel.created_at.desc()
@@ -35,7 +68,9 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
             "plant_name": plant.name if plant else "알 수 없는 발전소",
             "title": ins.title,
             "status": ins.status,
-            "created_at": ins.created_at
+            "rows": ins.rows,
+            "cols": ins.cols,
+            "created_at": ins.created_at.isoformat() if ins.created_at else ""
         })
         
     return {
@@ -43,5 +78,10 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
         "total_inspections": total_inspections,
         "analyzed_inspections": analyzed_inspections,
         "high_risk_zones_count": high_risk_zones_count,
-        "recent_inspections": recent_inspections
+        "recent_inspections": recent_inspections,
+        "recent_plants": recent_plants,
+        "capacity_by_type": capacity_by_type,
+        "total_zones_count": total_zones_count,
+        "total_anomaly_zones": total_anomaly_zones
     }
+

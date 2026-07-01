@@ -56,16 +56,16 @@ const PlantListPage: React.FC = () => {
       {/* Header controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-200 flex items-center gap-2">
-            <Factory className="w-5 h-5 text-brand-400" />
+          <h2 className="text-xl font-black text-slate-800 flex items-center gap-2">
+            <Factory className="w-5 h-5 text-brand-600" />
             태양광 발전소 관리 목록
           </h2>
-          <p className="text-xs text-slate-500 mt-1">AI 정밀 진단을 진행할 발전소 시설물을 관리 및 등록합니다.</p>
+          <p className="text-xs text-slate-400 font-semibold mt-1">AI 정밀 진단을 진행할 발전소 시설물을 관리 및 등록합니다.</p>
         </div>
 
         <button
           onClick={() => navigate('/plants/new')}
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-slate-100 font-bold text-sm tracking-wide shadow-md transition-colors self-start sm:self-auto"
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm tracking-wide shadow-md transition-colors self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           신규 발전소 등록
@@ -75,19 +75,19 @@ const PlantListPage: React.FC = () => {
       {/* Search filter */}
       {plants.length > 0 && (
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             placeholder="발전소명 또는 위치 검색..."
             value={searchQuery}
             onChange={handleSearch}
-            className="w-full bg-slate-900/60 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-brand-500 focus:bg-slate-950 transition-all"
+            className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 font-semibold focus:outline-none focus:border-brand-600 focus:bg-white transition-all shadow-2xs"
           />
         </div>
       )}
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm">
+        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-sm font-semibold">
           {error}
         </div>
       )}
@@ -100,7 +100,7 @@ const PlantListPage: React.FC = () => {
           actionButton={
             <button
               onClick={() => navigate('/plants/new')}
-              className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-slate-100 font-bold text-xs transition-colors"
+              className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs transition-colors cursor-pointer"
             >
               신규 발전소 등록
             </button>

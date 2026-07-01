@@ -1,5 +1,4 @@
 import React from 'react';
-import Sidebar from './Sidebar';
 import Header from './Header';
 
 interface LayoutProps {
@@ -8,25 +7,28 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 font-sans antialiased">
-      {/* Dynamic abstract radial background gradient for premium aesthetic */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      
-      {/* Sidebar Navigation */}
-      <Sidebar />
+    <div className="min-h-screen bg-slate-50 flex flex-col antialiased">
+      {/* Global Header / Navigation Bar */}
+      <Header />
 
-      {/* Main Container */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
-        <Header />
-        
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-          <div className="max-w-7xl mx-auto animate-fade-in">
-            {children}
+      {/* Main Content Area */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-fade-in">
+          {children}
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full bg-white border-t border-slate-200/80 py-6 text-center text-xs text-slate-400 font-medium">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>© 2026 SolarLoop AI Inc. All rights reserved.</span>
+          <div className="flex gap-4">
+            <a href="#" className="hover:text-slate-600 transition-colors">이용약관</a>
+            <a href="#" className="hover:text-slate-600 transition-colors">개인정보처리방침</a>
+            <a href="#" className="hover:text-slate-600 transition-colors">관제 센터 문의</a>
           </div>
-        </main>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 };

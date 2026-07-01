@@ -7,13 +7,31 @@ export interface DashboardSummary {
   total_inspections: number;
   analyzed_inspections: number;
   high_risk_zones_count: number;
+  total_zones_count: number;
+  total_anomaly_zones: number;
   recent_inspections: {
     id: number;
     plant_id: number;
     plant_name: string;
     title: string;
     status: string;
+    rows: number;
+    cols: number;
     created_at: string;
+  }[];
+  recent_plants: {
+    id: number;
+    name: string;
+    location: string;
+    location_name: string;
+    capacity_kw: number;
+    plant_type: string;
+    owner_name: string;
+    created_at: string;
+  }[];
+  capacity_by_type: {
+    plant_type: string;
+    total_capacity: number;
   }[];
 }
 

@@ -31,11 +31,11 @@ const PanelZoneGrid: React.FC<PanelZoneGridProps> = ({
   });
 
   return (
-    <div className="w-full bg-slate-950/80 border border-slate-800 rounded-2xl p-6 backdrop-blur-md">
+    <div className="w-full bg-white border border-slate-200 rounded-3xl p-6 shadow-xs">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-slate-300">태양광 패널 구역 상태 그리드 ({rows} x {cols})</h3>
+        <h3 className="text-sm font-black text-slate-800">태양광 패널 구역 상태 그리드 ({rows} x {cols})</h3>
         {isAnalyzed && (
-          <span className="text-xs text-slate-500 flex items-center gap-2">
+          <span className="text-xs text-slate-400 flex items-center gap-2 font-semibold">
             <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
             셀 클릭 시 상세 점수 및 가이드 확인 가능
           </span>
@@ -60,10 +60,10 @@ const PanelZoneGrid: React.FC<PanelZoneGridProps> = ({
                 key={zone.id}
                 type="button"
                 disabled
-                className="w-full h-full flex flex-col items-center justify-center border border-slate-800 bg-slate-900/30 text-slate-600 rounded-xl cursor-not-allowed"
+                className="w-full h-full flex flex-col items-center justify-center border border-slate-100 bg-slate-50 text-slate-400 rounded-xl cursor-not-allowed"
               >
-                <span className="text-xs md:text-sm font-bold">{zone.zone_code}</span>
-                <span className="text-[9px] mt-1 font-semibold tracking-wider opacity-60">대기</span>
+                <span className="text-xs md:text-sm font-black">{zone.zone_code}</span>
+                <span className="text-[9px] mt-1 font-bold tracking-wider opacity-60">대기</span>
               </button>
             );
           }
@@ -73,29 +73,29 @@ const PanelZoneGrid: React.FC<PanelZoneGridProps> = ({
               key={zone.id}
               type="button"
               onClick={() => onZoneClick(zone)}
-              className={`w-full h-full flex flex-col items-center justify-center p-1 border rounded-xl transition-all duration-200 relative group outline-none ${
+              className={`w-full h-full flex flex-col items-center justify-center p-1 border rounded-xl transition-all duration-200 relative group outline-none cursor-pointer ${
                 style.bgClass
               } ${
                 isSelected 
-                  ? 'ring-2 ring-brand-400 border-transparent scale-[1.02] z-10 shadow-lg shadow-brand-500/10' 
+                  ? 'ring-2 ring-brand-600 border-transparent scale-[1.02] z-10 shadow-md shadow-brand-500/10' 
                   : 'hover:scale-[1.01]'
               }`}
             >
               {/* Highlight badge for Top-3 actions */}
               {isTopAction && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 border border-slate-950 animate-ping"></span>
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white animate-ping"></span>
               )}
               {isTopAction && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 border border-slate-950"></span>
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white"></span>
               )}
 
-              <span className={`text-[10px] md:text-xs font-bold leading-none ${style.textClass} opacity-80 group-hover:opacity-100 transition-opacity`}>
+              <span className={`text-[10px] md:text-xs font-bold leading-none ${style.textClass} opacity-85 group-hover:opacity-100 transition-opacity`}>
                 {zone.zone_code}
               </span>
-              <span className="text-sm md:text-lg font-black tracking-tight text-slate-100 mt-0.5">
+              <span className="text-sm md:text-lg font-black tracking-tight text-slate-800 mt-0.5">
                 {Math.round(zone.priority_score)}
               </span>
-              <span className="text-[8px] md:text-[9px] font-semibold text-slate-400 mt-0.5 line-clamp-1 max-w-full">
+              <span className="text-[8px] md:text-[9px] font-bold text-slate-500 mt-0.5 line-clamp-1 max-w-full">
                 {style.text}
               </span>
             </button>
@@ -105,13 +105,13 @@ const PanelZoneGrid: React.FC<PanelZoneGridProps> = ({
       
       {/* Legend */}
       {isAnalyzed && (
-        <div className="mt-6 pt-4 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-5 gap-3">
           {(['NORMAL_MONITORING', 'CLEANING_PRIORITY', 'WAIT_FOR_RAIN', 'INSPECTION_REQUIRED', 'REPAIR_REVIEW'] as const).map((lbl) => {
             const style = getStatusStyle(lbl);
             return (
-              <div key={lbl} className="flex items-center gap-2 p-1.5 rounded-lg bg-slate-900/50 border border-slate-800/40">
+              <div key={lbl} className="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 border border-slate-200/50">
                 <span className={`w-3 h-3 rounded-md shrink-0 ${style.badgeBg.split(' ')[0]} border ${style.badgeBg.split(' ').slice(2).join(' ')}`}></span>
-                <span className="text-xs font-medium text-slate-400 leading-none">{style.text}</span>
+                <span className="text-xs font-bold text-slate-600 leading-none">{style.text}</span>
               </div>
             );
           })}
