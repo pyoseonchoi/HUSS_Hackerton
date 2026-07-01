@@ -1,0 +1,48 @@
+# Virtual Environments
+venv/
+.venv/
+ENV/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+
+# Package manager directories
+node_modules/
+jspm_packages/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+
+# Local databases and journals
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Env and sensitive configurations
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Drone Uploads / Simulated Cache files
+solarloop-ai/backend/app/static/uploads/*
+!solarloop-ai/backend/app/static/uploads/.gitkeep
+
+# Editor & System Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
