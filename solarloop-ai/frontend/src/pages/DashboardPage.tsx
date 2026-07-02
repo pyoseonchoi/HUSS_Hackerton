@@ -13,7 +13,6 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSeeding, setIsSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,24 +28,6 @@ const DashboardPage: React.FC = () => {
       setError(err.message || '대시보드 데이터를 가져오는데 실패했습니다.');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleSeedDemo = async () => {
-    try {
-      setIsSeeding(true);
-      setError(null);
-      const res = await seedDemoData();
-      // Redirect directly to the generated inspection details
-      if (res.inspection_id) {
-        navigate(`/inspections/${res.inspection_id}`);
-      } else {
-        await fetchSummary();
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.detail || err.message || '데모 시딩 중 오류가 발생했습니다.');
-    } finally {
-      setIsSeeding(false);
     }
   };
 
@@ -70,17 +51,6 @@ const DashboardPage: React.FC = () => {
             드론 촬영 이미지 분석 결과와 발전 통계를 종합하여 패널 노후화 상태를 실시간 진단합니다.
           </p>
         </div>
-
-        <div>
-          <button
-            onClick={handleSeedDemo}
-            disabled={isSeeding}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-bold text-xs tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer"
-          >
-            <Play className="w-3.5 h-3.5 fill-current" />
-            {isSeeding ? '데모 데이터 시뮬레이션 중...' : '원클릭 데모 데이터 생성'}
-          </button>
-        </div>
       </div>
 
       {error && (
@@ -96,7 +66,7 @@ const DashboardPage: React.FC = () => {
         <div className="border border-slate-200/85 bg-white rounded-3xl p-8 text-center text-slate-500 shadow-xs">
           <p className="text-xs font-semibold">등록된 태양광 발전소가 없습니다.</p>
           <p className="text-[11px] text-slate-400 mt-1">
-            원클릭 데모 데이터 생성 버튼을 클릭하거나 상단의 '신규 발전소 등록'을 통해 발전소 자산을 생성하십시오.
+            상단의 '신규 발전소 등록' 메뉴를 통해 발전소 자산을 생성하십시오.
           </p>
         </div>
       )}
