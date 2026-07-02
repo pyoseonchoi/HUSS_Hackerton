@@ -79,23 +79,27 @@ class DemoSeedingService:
     @staticmethod
     def _generate_rgb_image(path: str, rows: int, cols: int) -> None:
         """
-        Generates a simulated solar panel grid.
-        - Deep blue solar cells.
+        Generates a simulated solar panel grid overlaying the rooftop photo.
         - Cell A-03 (row 0, col 2) has brown dirt (soiling).
         - Cell B-04 (row 1, col 3) has green weed/leaf coverage (soiling).
         - Cell C-05 (row 2, col 4) has a dark shadow diagonal overlay (shading).
         """
         if os.path.exists(path):
-            return
+            os.remove(path) # Ensure we regenerate it with the new base image
             
         w, h = 960, 640
-        img = Image.new("RGB", (w, h), (20, 30, 60)) # dark background
+        base_img_path = os.path.join("app", "static", "default_rgb_rooftop.png")
+        if os.path.exists(base_img_path):
+            img = Image.open(base_img_path).resize((w, h))
+        else:
+            img = Image.new("RGB", (w, h), (20, 30, 60)) # fallback dark background
+        
         draw = ImageDraw.Draw(img)
         
         cell_w = w / cols
         cell_h = h / rows
         
-        # Draw solar panel cells
+        # Draw solar panel cell outlines and anomalies
         for r in range(rows):
             for c in range(cols):
                 cx1 = int(c * cell_w + 4)
@@ -103,13 +107,9 @@ class DemoSeedingService:
                 cx2 = int((c + 1) * cell_w - 4)
                 cy2 = int((r + 1) * cell_h - 4)
                 
-                # Default clean blue solar panel cell
-                draw.rectangle((cx1, cy1, cx2, cy2), fill=(15, 60, 150), outline=(220, 220, 220), width=2)
+                # Draw subtle white outline
+                draw.rectangle((cx1, cy1, cx2, cy2), outline=(255, 255, 255, 60), width=1)
                 
-                # Draw typical grid lines within solar cells (solar busbars)
-                for line_x in range(cx1 + 10, cx2, 20):
-                    draw.line((line_x, cy1, line_x, cy2), fill=(255, 255, 255, 100), width=1)
-                    
                 # Anomaly injections
                 # Row 0, Col 2 -> Dust/Soiling (A-03)
                 if r == 0 and c == 2:
@@ -143,10 +143,15 @@ class DemoSeedingService:
         - Cell D-02 (row 3, col 1) has a bright yellow/red hotspot.
         """
         if os.path.exists(path):
-            return
+            os.remove(path) # Ensure we regenerate it with the new base image
             
         w, h = 960, 640
-        img = Image.new("RGB", (w, h), (40, 10, 80)) # Cool purple infrared default
+        base_img_path = os.path.join("app", "static", "default_thermal_rooftop.png")
+        if os.path.exists(base_img_path):
+            img = Image.open(base_img_path).resize((w, h))
+        else:
+            img = Image.new("RGB", (w, h), (40, 10, 80)) # Cool purple infrared default
+            
         draw = ImageDraw.Draw(img)
         
         cell_w = w / cols
@@ -159,8 +164,8 @@ class DemoSeedingService:
                 cx2 = int((c + 1) * cell_w - 4)
                 cy2 = int((r + 1) * cell_h - 4)
                 
-                # Normal thermal cells: bluish purple
-                draw.rectangle((cx1, cy1, cx2, cy2), fill=(40, 15, 90), outline=(80, 40, 120), width=1)
+                # Draw subtle outline
+                draw.rectangle((cx1, cy1, cx2, cy2), outline=(255, 255, 255, 40), width=1)
                 
                 # Row 3, Col 1 -> Thermal hotspot anomaly (D-02)
                 if r == 3 and c == 1:

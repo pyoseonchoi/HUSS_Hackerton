@@ -17,5 +17,6 @@ class PlantCreate(PlantBase):
 class Plant(PlantBase):
     id: int
     created_at: datetime
+    latest_inspection_id: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)

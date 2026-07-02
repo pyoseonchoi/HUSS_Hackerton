@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutGrid, Factory, PlusCircle, ScanLine, Sun, CloudRain } from 'lucide-react';
+import { LayoutGrid, Factory, PlusCircle, ScanLine, Sun, CloudRain, Smartphone } from 'lucide-react';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -10,6 +10,7 @@ const Header: React.FC = () => {
     { path: '/plants', label: '발전소 목록', icon: Factory },
     { path: '/plants/new', label: '신규 발전소 등록', icon: PlusCircle },
     { path: '/inspections/new', label: '신규 드론점검 등록', icon: ScanLine },
+    { path: '/mobile-demo', label: '모바일 데모', icon: Smartphone },
   ];
 
   return (

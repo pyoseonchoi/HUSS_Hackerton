@@ -26,6 +26,77 @@ const InspectionDetailPage: React.FC = () => {
   const [selectedZone, setSelectedZone] = useState<PanelZone | null>(null);
   const [imageTab, setImageTab] = useState<'rgb' | 'thermal'>('rgb');
 
+  // Custom states for interactive remote control & zoom
+  const [disabledModules, setDisabledModules] = useState<Record<string, Record<number, boolean>>>({});
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (message: string) => {
+    setToast(message);
+    setTimeout(() => {
+      setToast(null);
+    }, 4000);
+  };
+
+  const handleToggleModule = (zoneCode: string, moduleNum: number) => {
+    setDisabledModules(prev => {
+      const zoneModules = prev[zoneCode] || {};
+      const nextVal = !zoneModules[moduleNum];
+      showToast(
+        nextVal
+          ? `[${zoneCode} 구역 - 모듈 #${moduleNum}] 마이크로인버터 원격 차단(OFF) 명령이 송신되었습니다.`
+          : `[${zoneCode} 구역 - 모듈 #${moduleNum}] 마이크로인버터 원격 가동(ON) 명령이 송신되었습니다.`
+      );
+      return {
+        ...prev,
+        [zoneCode]: {
+          ...zoneModules,
+          [moduleNum]: nextVal
+        }
+      };
+    });
+  };
+
+  const handleToggleInverter = (zoneCode: string) => {
+    setDisabledModules(prev => {
+      const zoneModules = prev[zoneCode] || {};
+      const allDisabled = [1, 2, 3, 4, 5, 6].every(num => zoneModules[num]);
+      const nextVal = !allDisabled;
+      
+      showToast(
+        nextVal
+          ? `[${zoneCode} 구역 전체] 마이크로인버터 원격 일괄 차단(OFF) 명령이 송신되었습니다.`
+          : `[${zoneCode} 구역 전체] 마이크로인버터 원격 일괄 가동(ON) 명령이 송신되었습니다.`
+      );
+      
+      const updatedModules: Record<number, boolean> = {};
+      [1, 2, 3, 4, 5, 6].forEach(num => {
+        updatedModules[num] = nextVal;
+      });
+      
+      return {
+        ...prev,
+        [zoneCode]: updatedModules
+      };
+    });
+  };
+
+  const getZoomStyle = (): React.CSSProperties => {
+    if (!selectedZone || !isZoomed) return {};
+    const scale = 2.5;
+    
+    // Grid size is 4x6.
+    // Calculate translate percentages based on zone position to center the target zone
+    const tx = -(selectedZone.x * 100 - (100 / scale) / 2);
+    const ty = -(selectedZone.y * 100 - (100 / scale) / 2);
+    
+    return {
+      transform: `scale(${scale}) translate(${tx}%, ${ty}%)`,
+      transformOrigin: 'top left',
+      transition: 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)'
+    };
+  };
+
   useEffect(() => {
     if (id) {
       fetchDetail();
@@ -160,7 +231,21 @@ const InspectionDetailPage: React.FC = () => {
                 드론 수집 영상 매핑 뷰어
               </span>
               
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                {selectedZone && (
+                  <button
+                    type="button"
+                    onClick={() => setIsZoomed(!isZoomed)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-black border flex items-center gap-1 transition-all cursor-pointer ${
+                      isZoomed 
+                        ? 'bg-brand-50 border-brand-200 text-brand-700 shadow-2xs' 
+                        : 'bg-white border-slate-250 text-slate-650 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span>{isZoomed ? '🔍 전체보기' : `🔍 ${selectedZone.zone_code} 확대`}</span>
+                  </button>
+                )}
+                
                 <button
                   type="button"
                   onClick={() => setImageTab('rgb')}
@@ -195,6 +280,7 @@ const InspectionDetailPage: React.FC = () => {
                 <img
                   src={image_url}
                   alt="Drone RGB Inspection"
+                  style={getZoomStyle()}
                   className="w-full h-full object-cover select-none"
                 />
               ) : (
@@ -202,6 +288,7 @@ const InspectionDetailPage: React.FC = () => {
                   <img
                     src={thermal_image_url}
                     alt="Drone Thermal Infrared Inspection"
+                    style={getZoomStyle()}
                     className="w-full h-full object-cover select-none animate-fade-in"
                   />
                 ) : (
@@ -213,25 +300,42 @@ const InspectionDetailPage: React.FC = () => {
               {isAnalyzed && (
                 <div className="absolute inset-0 grid" style={{
                   gridTemplateColumns: `repeat(${inspection.cols}, minmax(0, 1fr))`,
-                  gridTemplateRows: `repeat(${inspection.rows}, minmax(0, 1fr))`
+                  gridTemplateRows: `repeat(${inspection.rows}, minmax(0, 1fr))`,
+                  ...getZoomStyle()
                 }}>
                   {zones.map((zone) => {
                     const isSelected = selectedZone?.id === zone.id;
+                    const zoneModules = disabledModules[zone.zone_code] || {};
+                    const disabledCount = [1, 2, 3, 4, 5, 6].filter(num => zoneModules[num]).length;
+                    const isAllDisabled = disabledCount === 6;
+                    const isAnyDisabled = disabledCount > 0 && disabledCount < 6;
                     
                     return (
                       <div
                         key={zone.id}
                         onClick={() => setSelectedZone(zone)}
-                        className={`w-full h-full border border-white/20 hover:bg-slate-500/10 transition-all duration-150 cursor-pointer flex items-center justify-center relative ${
-                          isSelected ? 'bg-brand-500/15 border-brand-500 ring-2 ring-brand-600 z-10' : ''
+                        className={`w-full h-full border border-white/10 hover:bg-slate-500/10 transition-all duration-150 cursor-pointer flex flex-col items-center justify-center relative ${
+                          isAllDisabled
+                            ? 'bg-slate-900/60 border-rose-500/30'
+                            : isAnyDisabled
+                              ? 'bg-amber-500/20 border-amber-500/30'
+                              : isSelected 
+                                ? 'bg-brand-500/15 border-brand-500 ring-2 ring-brand-600 z-10' 
+                                : ''
                         }`}
                       >
-                        <span className={`px-1 py-0.5 rounded text-[8px] font-black ${
-                          isSelected 
-                            ? 'bg-brand-650 text-white shadow-xs' 
-                            : 'bg-slate-900/80 text-white'
+                        <span className={`px-1 py-0.5 rounded text-[7px] font-black ${
+                          isAllDisabled
+                            ? 'bg-rose-600 text-white shadow-xs'
+                            : isAnyDisabled
+                              ? 'bg-amber-600 text-white shadow-xs'
+                              : isSelected 
+                                ? 'bg-brand-650 text-white shadow-xs' 
+                                : 'bg-slate-900/70 text-white'
                         }`}>
                           {zone.zone_code}
+                          {isAllDisabled && ' (OFF)'}
+                          {isAnyDisabled && ` (${disabledCount}/6 OFF)`}
                         </span>
                       </div>
                     );
@@ -264,17 +368,20 @@ const InspectionDetailPage: React.FC = () => {
           </div>
 
           {/* Selected details */}
-          <div className="h-[520px] shrink-0">
+          <div className="h-[620px] shrink-0">
             {selectedZone ? (
               <ZoneDetailDrawer
                 zone={selectedZone}
                 onClose={() => setSelectedZone(null)}
+                disabledModules={disabledModules[selectedZone.zone_code] || {}}
+                onToggleModule={(num) => handleToggleModule(selectedZone.zone_code, num)}
+                onToggleInverter={() => handleToggleInverter(selectedZone.zone_code)}
               />
             ) : (
               <div className="w-full h-full border border-slate-200 bg-slate-50 rounded-3xl p-6 flex flex-col items-center justify-center text-center text-slate-400">
                 <Info className="w-8 h-8 mb-2 opacity-40 text-slate-400" />
                 <span className="text-xs font-black">선택된 구역 없음</span>
-                <span className="text-[10px] font-semibold mt-1 text-slate-400">그리드나 우선순위 리스트에서 구역을 선택하면<br />상세 결함 프로필 차트를 확인할 수 있습니다.</span>
+                <span className="text-[10px] font-semibold mt-1 text-slate-400">그리드나 우선순위 리스트에서 구역을 선택하면<br />상세 결함 프로필 차트 및 인버터 제어를 제어할 수 있습니다.</span>
               </div>
             )}
           </div>
@@ -369,6 +476,14 @@ const InspectionDetailPage: React.FC = () => {
               </table>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Toast Notification for Remote Control commands */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[9999] bg-slate-900 border border-slate-800 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 animate-fade-in">
+          <span className="text-emerald-400 animate-pulse">⚡</span>
+          <span>{toast}</span>
         </div>
       )}
     </div>

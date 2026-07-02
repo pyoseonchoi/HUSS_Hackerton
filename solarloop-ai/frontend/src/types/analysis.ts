@@ -15,8 +15,14 @@ export interface PanelZone {
   generation_loss_score: number;
   priority_score: number;
   status_label: 'NORMAL' | 'SOILING' | 'SHADING' | 'THERMAL_ANOMALY' | 'PHYSICAL_DAMAGE_SUSPECTED' | 'GENERATION_LOSS_SUSPECTED';
-  recommendation_label: 'NORMAL_MONITORING' | 'CLEANING_PRIORITY' | 'INSPECTION_REQUIRED' | 'WAIT_FOR_RAIN' | 'REPAIR_REVIEW';
+  recommendation_label: 'NORMAL_MONITORING' | 'CLEANING_PRIORITY' | 'INSPECTION_REQUIRED' | 'WAIT_FOR_RAIN' | 'REPAIR_REVIEW' | 'ANALYSIS_EXCLUDED';
   explanation?: string;
+  modules?: Array<{
+    module_number: number;
+    polygon: Array<[number, number]>;
+    confidence: number;
+    status: string;
+  }>;
 }
 
 export interface MaintenanceAction {

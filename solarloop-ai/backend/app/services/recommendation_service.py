@@ -26,6 +26,13 @@ class RecommendationService:
         
         # 1. Update scores & recommendations for each zone
         for zone in zones:
+            if not zone.modules:
+                zone.priority_score = 0.0
+                zone.status_label = "NORMAL"
+                zone.recommendation_label = "ANALYSIS_EXCLUDED"
+                zone.explanation = "이 구역은 태양광 패널이 존재하지 않는 빈 공간(옥상 바닥 또는 공터)으로 자동 분류되어 분석에서 제외되었습니다."
+                continue
+                
             soiling = zone.soiling_score
             shading = zone.shading_score
             thermal = zone.thermal_score

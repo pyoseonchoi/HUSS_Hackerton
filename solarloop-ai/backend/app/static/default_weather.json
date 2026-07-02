@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-07-01 12:00:00",
+  "temperature_c": 28.5,
+  "solar_irradiance_wm2": 850.0,
+  "wind_speed_ms": 3.2,
+  "humidity_percent": 45,
+  "cloud_cover_percent": 10,
+  "weather_condition": "Clear"
+}

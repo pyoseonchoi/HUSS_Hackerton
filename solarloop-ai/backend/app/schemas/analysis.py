@@ -26,6 +26,7 @@ class PanelZoneCreate(PanelZoneBase):
 class PanelZone(PanelZoneBase):
     id: int
     inspection_id: int
+    modules: Optional[List[dict]] = []
 
     model_config = ConfigDict(from_attributes=True)
 

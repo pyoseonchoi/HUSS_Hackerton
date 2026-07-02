@@ -1,5 +1,6 @@
 import client from './client';
 import type { Inspection, InspectionDetail } from '../types/inspection';
+import type { Plant } from '../types/plant';
 
 
 export interface DashboardSummary {
@@ -19,16 +20,7 @@ export interface DashboardSummary {
     cols: number;
     created_at: string;
   }[];
-  recent_plants: {
-    id: number;
-    name: string;
-    location: string;
-    location_name: string;
-    capacity_kw: number;
-    plant_type: string;
-    owner_name: string;
-    created_at: string;
-  }[];
+  recent_plants: Plant[];
   capacity_by_type: {
     plant_type: string;
     total_capacity: number;

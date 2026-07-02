@@ -48,6 +48,14 @@ export const getStatusStyle = (label: string): StatusStyle => {
         textClass: 'text-purple-400',
         badgeBg: 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
       };
+    case 'ANALYSIS_EXCLUDED':
+      return {
+        text: '분석 제외 (설치 모듈 없음)',
+        bgClass: 'bg-slate-500/10 hover:bg-slate-500/20 border-slate-500/30',
+        borderClass: 'border-slate-300',
+        textClass: 'text-slate-400',
+        badgeBg: 'bg-slate-100 text-slate-500 border border-slate-200'
+      };
     default:
       return {
         text: '기타 상태',

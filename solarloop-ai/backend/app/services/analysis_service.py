@@ -95,6 +95,12 @@ class AnalysisService:
             meta = {"overall_thermal_mean": overall_thermal_mean}
             res = analyzer.analyze_zone(rgb_crop, thermal_crop, metadata=meta)
             
+            # Run dynamic YOLO/CV module segmentation
+            from app.services.yolo_segmentation_service import YOLOSegmentationService
+            import json
+            detected_mods = YOLOSegmentationService.detect_modules_in_crop(rgb_crop, thermal_crop, zone.zone_code)
+            zone.modules_json = json.dumps(detected_mods)
+            
             # Set scores
             zone.soiling_score = res.soiling_score
             zone.shading_score = res.shading_score

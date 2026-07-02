@@ -23,5 +23,16 @@ class PanelZone(Base):
     status_label = Column(String, default="NORMAL", nullable=False)  # NORMAL, SOILING, SHADING, THERMAL_ANOMALY, PHYSICAL_DAMAGE_SUSPECTED, GENERATION_LOSS_SUSPECTED
     recommendation_label = Column(String, default="NORMAL_MONITORING", nullable=False)  # NORMAL_MONITORING, CLEANING_PRIORITY, INSPECTION_REQUIRED, WAIT_FOR_RAIN, REPAIR_REVIEW
     explanation = Column(String, nullable=True)
+    modules_json = Column(String, nullable=True)  # JSON-serialized list of detected modules
 
     inspection = relationship("Inspection", back_populates="zones")
+
+    @property
+    def modules(self):
+        import json
+        if self.modules_json:
+            try:
+                return json.loads(self.modules_json)
+            except Exception:
+                return []
+        return []

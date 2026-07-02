@@ -46,3 +46,16 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.5);
 }
+
+/* Leaflet popup customization to prevent vertical clipping */
+.leaflet-popup-content-wrapper {
+  padding: 8px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+}
+
+.leaflet-popup-content {
+  margin: 6px !important;
+  line-height: inherit !important;
+  width: 250px !important;
+}

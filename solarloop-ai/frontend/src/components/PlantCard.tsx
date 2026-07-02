@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Zap, User, ArrowRight, Activity } from 'lucide-react';
+import { MapPin, Zap, User, Activity, BarChart2 } from 'lucide-react';
 import type { Plant } from '../types/plant';
 
 import { formatCapacity, getPlantTypeLabel } from '../utils/format';
@@ -47,18 +47,18 @@ const PlantCard: React.FC<PlantCardProps> = ({ plant }) => {
       <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
         <Link
           to={`/inspections/new?plant_id=${plant.id}`}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-bold text-white transition-all duration-200 cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-150 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-all duration-200 cursor-pointer"
         >
-          <Activity className="w-3.5 h-3.5" />
-          점검 업로드
+          <Activity className="w-3.5 h-3.5 text-slate-500" />
+          신규 점검
         </Link>
         
         <Link
-          to={`/plants/${plant.id}`}
+          to={plant.latest_inspection_id ? `/inspections/${plant.latest_inspection_id}` : `/inspections/new?plant_id=${plant.id}`}
           className="inline-flex items-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-500 transition-colors duration-200 group/link cursor-pointer"
         >
-          상세 보기
-          <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
+          {plant.latest_inspection_id ? 'AI 정밀 진단' : '점검 등록'}
+          <BarChart2 className="w-3.5 h-3.5 text-brand-600 transition-transform duration-200 group-hover/link:translate-x-0.5" />
         </Link>
       </div>
     </div>
