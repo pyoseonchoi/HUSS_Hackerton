@@ -106,6 +106,11 @@ const NationalSolarMap: React.FC<NationalSolarMapProps> = ({ plants }) => {
         {/* Right Interactive Leaflet Map Pane */}
         <div className="lg:col-span-8 relative">
           <div className="w-full h-[420px] rounded-2xl border border-slate-200 overflow-hidden shadow-inner relative z-20">
+            {/* Top-left title label */}
+            <div className="absolute top-4 left-14 z-[1000] bg-white/95 border border-slate-200/80 backdrop-blur-xs rounded-lg px-3 py-1.5 shadow-md pointer-events-none">
+              <span className="text-[10px] font-black text-slate-600 tracking-wide">한국남부발전 발전소 현황</span>
+            </div>
+
             {/* Map Legend Overlay */}
             <div className="absolute top-4 right-4 z-[1000] bg-white/95 border border-slate-200/80 backdrop-blur-xs rounded-xl p-3 shadow-md text-[10px] text-slate-655 font-semibold space-y-1.5 pointer-events-auto">
               <div className="text-[9px] font-black uppercase text-slate-400 tracking-wider mb-0.5">
@@ -143,7 +148,7 @@ const NationalSolarMap: React.FC<NationalSolarMapProps> = ({ plants }) => {
                 if (!hasCoordinates) return null;
 
                 const isHovered = activePlantId === plant.id;
-                
+
                 // Helper to get status with robust fallback
                 const getStatus = (): 'critical' | 'warning' | 'normal' => {
                   if (plant.status) return plant.status;
@@ -170,20 +175,19 @@ const NationalSolarMap: React.FC<NationalSolarMapProps> = ({ plants }) => {
                       }
                     }}
                   >
-                    <Popup 
+                    <Popup
                       className="custom-popup"
                       minWidth={250}
                       maxWidth={280}
                     >
                       <div className="p-0.5 text-slate-800 w-[240px]">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
-                            status === 'critical' 
+                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${status === 'critical'
                               ? 'text-rose-600 bg-rose-50 border-rose-100'
                               : status === 'warning'
                                 ? 'text-amber-600 bg-amber-50 border-amber-100'
                                 : 'text-emerald-600 bg-emerald-50 border-emerald-100'
-                          }`}>
+                            }`}>
                             {status === 'critical' ? '조치 필요 (심각)' : status === 'warning' ? '주의 요함 (오류)' : '안전 가동'}
                           </span>
                           <span className="text-[9px] font-bold text-slate-400">
@@ -196,7 +200,7 @@ const NationalSolarMap: React.FC<NationalSolarMapProps> = ({ plants }) => {
                         <p className="text-[10px] text-slate-400 m-0 mt-0.5 leading-normal">
                           {plant.location_name}
                         </p>
-                        
+
                         {/* Real-time operational details inside the popup */}
                         <div className="mt-2 pt-1.5 border-t border-slate-100 space-y-0.5 text-[11px] text-slate-655 font-semibold">
                           <div className="flex justify-between items-center">
@@ -207,32 +211,28 @@ const NationalSolarMap: React.FC<NationalSolarMapProps> = ({ plants }) => {
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-slate-400 font-medium">가동 효율:</span>
-                            <span className={`font-bold ${
-                              (plant.efficiency_pct ?? 100) >= 80 ? 'text-emerald-600' : 'text-amber-600'
-                            }`}>
+                            <span className={`font-bold ${(plant.efficiency_pct ?? 100) >= 80 ? 'text-emerald-600' : 'text-amber-600'
+                              }`}>
                               {plant.efficiency_pct ?? 100}%
                             </span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-slate-400 font-medium">드론 결함 셀:</span>
-                            <span className={`font-bold flex items-center gap-0.5 ${
-                              status === 'critical' ? 'text-rose-500' : status === 'warning' ? 'text-amber-500' : 'text-emerald-600'
-                            }`}>
+                            <span className={`font-bold flex items-center gap-0.5 ${status === 'critical' ? 'text-rose-500' : status === 'warning' ? 'text-amber-500' : 'text-emerald-600'
+                              }`}>
                               {status !== 'normal' ? <ShieldAlert className="w-3 h-3 inline shrink-0" /> : <Award className="w-3 h-3 inline shrink-0" />}
                               {plant.anomaly_count ?? 0} / {plant.total_zones ?? 24} 구역
                             </span>
                           </div>
-                          
+
                           {/* Recommended action recommendation */}
                           {(plant.latest_action && status !== 'normal') && (
-                            <div className={`mt-1.5 p-1.5 rounded-lg border text-[10px] leading-relaxed font-medium ${
-                              status === 'critical'
+                            <div className={`mt-1.5 p-1.5 rounded-lg border text-[10px] leading-relaxed font-medium ${status === 'critical'
                                 ? 'bg-rose-50 border-rose-100/50 text-rose-700'
                                 : 'bg-amber-50 border-amber-100/50 text-amber-700'
-                            }`}>
-                              <strong className={`block text-[8px] uppercase tracking-wider font-black mb-0.5 ${
-                                status === 'critical' ? 'text-rose-500' : 'text-amber-500'
                               }`}>
+                              <strong className={`block text-[8px] uppercase tracking-wider font-black mb-0.5 ${status === 'critical' ? 'text-rose-500' : 'text-amber-500'
+                                }`}>
                                 최우선 조치 제언
                               </strong>
                               {plant.latest_action}

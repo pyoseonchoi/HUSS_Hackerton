@@ -36,10 +36,14 @@ const DashboardPage: React.FC = () => {
   }
 
   // Pre-process chart data
-  const chartData = summary?.capacity_by_type.map(item => ({
-    name: item.plant_type === 'ROOFTOP' ? '지붕형' : item.plant_type === 'GROUND' ? '지상형' : '수상형',
-    '용량 (kW)': item.total_capacity
-  })) || [];
+  const chartData = summary?.capacity_by_type.map(item => {
+    const typeKey = item.plant_type.toLowerCase();
+    const name = typeKey === 'rooftop' ? '지붕형'
+      : typeKey === 'ground' ? '지상형'
+      : typeKey === 'public_building' ? '공공시설형'
+      : '수상형';
+    return { name, '용량 (kW)': item.total_capacity };
+  }) || [];
 
   return (
     <div className="space-y-8">
@@ -110,6 +114,112 @@ const DashboardPage: React.FC = () => {
           trend="양호"
         />
       </div>
+
+      {/* 2.5 Management Priority Alert Panel */}
+      {summary && summary.recent_plants.length > 0 && (() => {
+        const getPlantStatus = (plant: any): 'critical' | 'warning' | 'normal' => {
+          if (plant.status) return plant.status;
+          if (!plant.anomaly_count || plant.anomaly_count === 0) return 'normal';
+          const action = plant.latest_action || '';
+          if (action.includes('정밀점검') || action.includes('수리') || action.includes('긴급')) return 'critical';
+          return 'warning';
+        };
+
+        const priorityPlants = [...summary.recent_plants]
+          .map(p => ({ ...p, _status: getPlantStatus(p) }))
+          .filter(p => p._status !== 'normal')
+          .sort((a, b) => {
+            const order = { critical: 0, warning: 1, normal: 2 };
+            if (order[a._status] !== order[b._status]) return order[a._status] - order[b._status];
+            return (b.anomaly_count || 0) - (a.anomaly_count || 0);
+          })
+          .slice(0, 5);
+
+        if (priorityPlants.length === 0) return null;
+
+        return (
+          <div className="border border-slate-200/80 bg-white rounded-3xl p-6 shadow-xs">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-black text-slate-800 flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-rose-500 animate-pulse" />
+                관리 우선순위 발전소
+              </h3>
+              <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-md">
+                총 {priorityPlants.length}개소 조치 필요
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+              {priorityPlants.map((plant, idx) => {
+                const isCritical = plant._status === 'critical';
+                return (
+                  <button
+                    key={plant.id}
+                    onClick={() => {
+                      if (plant.latest_inspection_id) {
+                        navigate(`/inspections/${plant.latest_inspection_id}`);
+                      }
+                    }}
+                    className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 cursor-pointer hover:shadow-md active:scale-[0.98] ${
+                      isCritical
+                        ? 'border-rose-200 bg-rose-50/50 hover:border-rose-300 hover:bg-rose-50'
+                        : 'border-amber-200 bg-amber-50/50 hover:border-amber-300 hover:bg-amber-50'
+                    }`}
+                  >
+                    {/* Rank badge */}
+                    <div className={`absolute top-2.5 right-2.5 w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black ${
+                      isCritical
+                        ? 'bg-rose-500 text-white'
+                        : 'bg-amber-500 text-white'
+                    }`}>
+                      {idx + 1}
+                    </div>
+
+                    {/* Status dot */}
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                        isCritical ? 'bg-rose-500 animate-pulse' : 'bg-amber-500'
+                      }`} />
+                      <span className={`text-[9px] font-black uppercase tracking-wider ${
+                        isCritical ? 'text-rose-500' : 'text-amber-600'
+                      }`}>
+                        {isCritical ? '심각' : '주의'}
+                      </span>
+                    </div>
+
+                    <h4 className={`text-xs font-black leading-tight mb-1 line-clamp-1 transition-colors ${
+                      isCritical
+                        ? 'text-rose-800 group-hover:text-rose-600'
+                        : 'text-amber-800 group-hover:text-amber-600'
+                    }`}>
+                      {plant.name}
+                    </h4>
+
+                    <p className="text-[10px] text-slate-500 font-semibold line-clamp-1 mb-2">
+                      {plant.location_name}
+                    </p>
+
+                    <div className={`text-[10px] font-bold px-2 py-1 rounded-lg border leading-relaxed line-clamp-2 ${
+                      isCritical
+                        ? 'bg-rose-100/60 border-rose-200/60 text-rose-700'
+                        : 'bg-amber-100/60 border-amber-200/60 text-amber-700'
+                    }`}>
+                      {plant.latest_action || '이상 구역 감지됨'}
+                    </div>
+
+                    <div className={`mt-2.5 text-[9px] font-bold flex items-center gap-0.5 transition-colors ${
+                      isCritical
+                        ? 'text-rose-400 group-hover:text-rose-600'
+                        : 'text-amber-400 group-hover:text-amber-600'
+                    }`}>
+                      상세 보고서 보기 →
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 3. Under Table and Bar Charts split */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

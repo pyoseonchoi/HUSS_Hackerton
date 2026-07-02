@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Factory, Search } from 'lucide-react';
-import { getPlants } from '../api/plants';
+import { getDashboardSummary } from '../api/inspections';
 import type { Plant } from '../types/plant';
 import PlantCard from '../components/PlantCard';
 
@@ -23,9 +23,11 @@ const PlantListPage: React.FC = () => {
   const fetchPlants = async () => {
     try {
       setIsLoading(true);
-      const data = await getPlants();
-      setPlants(data);
-      setFilteredPlants(data);
+      // Use dashboard API to get enriched plant data with status, anomaly_count, latest_action
+      const summary = await getDashboardSummary();
+      const enrichedPlants = summary.recent_plants as Plant[];
+      setPlants(enrichedPlants);
+      setFilteredPlants(enrichedPlants);
     } catch (err: any) {
       setError(err.message || '발전소 목록을 가져오지 못했습니다.');
     } finally {
