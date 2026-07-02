@@ -44,7 +44,7 @@ const MobileDemoPage: React.FC = () => {
           <div>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/25 text-[10px] font-bold text-blue-400">
               <Smartphone className="w-3 h-3" />
-              자율 관제 데모 시뮬레이터
+              드론 관제 데모 시뮬레이터
             </span>
             <h1 className="text-xl font-black tracking-tight text-white mt-0.5">
               실시간 모바일 앱 뷰어

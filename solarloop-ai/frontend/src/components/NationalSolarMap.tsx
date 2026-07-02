@@ -70,7 +70,7 @@ const NationalSolarMap: React.FC<NationalSolarMapProps> = ({ plants }) => {
               실시간 전국 자동 관제망
             </span>
             <h3 className="text-xl font-black text-slate-800 tracking-tight leading-snug">
-              자율 비행 드론<br />
+              비행 드론<br />
               실시간 원격 진단 지도
             </h3>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed">

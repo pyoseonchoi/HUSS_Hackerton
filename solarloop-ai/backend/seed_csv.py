@@ -117,7 +117,7 @@ def seed_from_csv():
                 # Create 1 auto-diagnostic Inspection record for this plant
                 inspection = Inspection(
                     plant_id=plant.id,
-                    title="드론 자율 점검 및 AI 진단 보고서",
+                    title="드론 점검 및 AI 진단 보고서",
                     rgb_image_path=rgb_image_url,
                     thermal_image_path=thermal_image_url,
                     generation_csv_path=generation_csv_url,
@@ -312,7 +312,7 @@ def seed_from_csv():
                         action_type="NORMAL_MONITORING",
                         priority_rank=3,
                         expected_recovery_kwh=0.0,
-                        reason="특이 조치 사항 없음. 차기 드론 자율 진단 비행 일정까지 모니터링 시스템을 지속 운영합니다."
+                        reason="특이 조치 사항 없음. 차기 드론 진단 비행 일정까지 모니터링 시스템을 지속 운영합니다."
                     )
                 elif plant_severity_type == 1:
                     # Warning plant actions
@@ -349,7 +349,7 @@ def seed_from_csv():
                         action_type="NORMAL_MONITORING",
                         priority_rank=3,
                         expected_recovery_kwh=0.0,
-                        reason="특이 조치 사항 없음. 차기 드론 자율 진단 비행 일정까지 모니터링 시스템을 지속 운영합니다."
+                        reason="특이 조치 사항 없음. 차기 드론 진단 비행 일정까지 모니터링 시스템을 지속 운영합니다."
                     )
                 else: # plant_severity_type == 2
                     # Defective plant actions
