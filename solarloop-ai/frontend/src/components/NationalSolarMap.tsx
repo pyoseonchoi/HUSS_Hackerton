@@ -74,7 +74,7 @@ const NationalSolarMap: React.FC<NationalSolarMapProps> = ({ plants }) => {
               실시간 원격 진단 지도
             </h3>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-              OpenStreetMap 지도를 확대/축소하여 발전소의 정확한 지리적 위치를 조회할 수 있습니다. 핀 마커를 클릭하여 팝업을 띄운 뒤, 팝업 안의 **'상세 뷰어로 이동'** 버튼을 누르시면 진단 화면으로 연결됩니다.
+              지도를 자유롭게 확대/축소하여 각 태양광 발전소의 실시간 상태와 정확한 지리적 위치를 조회할 수 있습니다. 마커를 클릭하면 상세 팝업이 표시되며, 상세 뷰어로 이동하여 드론 점검 리스트를 바로 분석할 수 있습니다.
             </p>
           </div>
 
@@ -131,10 +131,10 @@ const NationalSolarMap: React.FC<NationalSolarMapProps> = ({ plants }) => {
               scrollWheelZoom={true}
               className="w-full h-full"
             >
-              {/* Clean Leaflet tiles */}
+              {/* Premium, minimal grayscale map style (CartoDB Positron) */}
               <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
               />
 
               {/* Markers for each plant */}
