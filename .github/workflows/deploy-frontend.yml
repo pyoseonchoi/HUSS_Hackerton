@@ -1,0 +1,40 @@
+name: Deploy Frontend to cloudtype
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'solarloop-ai/frontend/**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Connect deploy key
+        uses: cloudtype-github-actions/connect@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          ghtoken: ${{ secrets.GHP_TOKEN }}
+      - name: Deploy
+        uses: cloudtype-github-actions/deploy@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          project: pyoseonchoi/huss_hackerton
+          stage: main
+          yaml: |
+            name: huss-hackerton-front
+            app: node@24
+            options:
+              ports: "4173"
+              build: npm run build
+              start: npx vite preview --host 0.0.0.0 --port 4173
+              env:
+                - name: VITE_API_BASE_URL
+                  value: https://port-0-huss-hackerton-mr2soxbie25b98b7.sel3.cloudtype.app
+              buildenv: []
+            context:
+              git:
+                url: git@github.com:${{ github.repository }}.git
+                ref: ${{ github.ref }}
+                path: solarloop-ai/frontend
