@@ -24,7 +24,7 @@ out/
 .next/
 
 # Local databases and journals
-*.db
+# *.db
 *.db-journal
 *.sqlite
 *.sqlite3
